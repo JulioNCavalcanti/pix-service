@@ -1,16 +1,21 @@
 package com.julio.pixservice.infrastructure.api;
 
+import com.julio.pixservice.application.dto.BalanceDTO;
 import com.julio.pixservice.application.dto.WalletDTO;
 import com.julio.pixservice.application.dto.WalletTransactionRequest;
 import com.julio.pixservice.application.usecase.CreateWalletUseCase;
 import com.julio.pixservice.application.usecase.DepositUseCase;
+import com.julio.pixservice.application.usecase.GetBalanceUseCase;
 import com.julio.pixservice.application.usecase.WithdrawUseCase;
 import com.julio.pixservice.domain.model.Wallet;
 import lombok.RequiredArgsConstructor;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.UUID;
 
 @RestController
@@ -20,6 +25,7 @@ public class WalletController {
     private final CreateWalletUseCase createWalletUseCase;
     private final DepositUseCase depositUseCase;
     private final WithdrawUseCase withdrawUseCase;
+    private final GetBalanceUseCase getBalanceUseCase;
 
     @PostMapping
     public ResponseEntity<WalletDTO> createWallet() {
@@ -39,5 +45,19 @@ public class WalletController {
     public ResponseEntity<WalletDTO> withdraw(@PathVariable UUID id, @RequestBody WalletTransactionRequest request) {
         Wallet updatedWallet = withdrawUseCase.execute(id, request.amount());
         return ResponseEntity.ok(WalletDTO.from(updatedWallet));
+    }
+
+    @GetMapping("/{id}/balance")
+    public ResponseEntity<BalanceDTO> getBalance(
+            @PathVariable UUID id,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime at) {
+
+        BigDecimal balance = getBalanceUseCase.execute(id, at);
+
+        return ResponseEntity.ok(new BalanceDTO(
+                id,
+                balance,
+                at != null ? at : LocalDateTime.now()
+        ));
     }
 }

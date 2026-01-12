@@ -7,6 +7,10 @@ import com.julio.pixservice.infrastructure.persistence.repository.SpringDataLedg
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
+import java.math.BigDecimal;
+import java.time.LocalDateTime;
+import java.util.UUID;
+
 @Component
 @RequiredArgsConstructor
 public class LedgerGatewayImpl implements LedgerGateway {
@@ -24,5 +28,11 @@ public class LedgerGatewayImpl implements LedgerGateway {
                 entry.getCreatedAt()
         );
         repository.save(entity);
+    }
+
+    @Override
+    public BigDecimal getBalanceAt(UUID walletId, LocalDateTime date) {
+        // Chama a query personalizada que criamos no passo anterior
+        return repository.calculateBalanceUntil(walletId, date);
     }
 }
