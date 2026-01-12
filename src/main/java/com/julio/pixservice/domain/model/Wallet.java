@@ -16,7 +16,7 @@ public class Wallet {
         this.id = UUID.randomUUID();
         this.balance = BigDecimal.ZERO;
         this.createdAt = LocalDateTime.now();
-        this.version = 0L;
+        this.version = null;
     }
 
     public Wallet(UUID id, BigDecimal balance, LocalDateTime createdAt, Long version) {
