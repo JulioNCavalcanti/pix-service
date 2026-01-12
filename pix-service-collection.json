@@ -1,0 +1,326 @@
+{
+    "info": {
+        "_postman_id": "b1211a2a-d95b-47df-bc58-5f78605f7812",
+        "name": "pix-service-updated",
+        "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+        "_exporter_id": "27679858"
+    },
+    "item": [
+        {
+            "name": "Wallets",
+            "item": [
+                {
+                    "name": "1. Create Wallet",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "var jsonData = pm.response.json();",
+                                    "pm.collectionVariables.set(\"wallet_id\", jsonData.id);",
+                                    "console.log(\"Wallet ID salvo: \" + jsonData.id);"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "POST",
+                        "header": [],
+                        "url": {
+                            "raw": "{{base_url}}/wallets",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "wallets"
+                            ]
+                        }
+                    },
+                    "response": []
+                },
+                {
+                    "name": "2. Register Pix Key",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "var jsonData = pm.response.json();",
+                                    "if (jsonData.key) {",
+                                    "    pm.collectionVariables.set(\"last_pix_key\", jsonData.key);",
+                                    "    console.log(\"Pix Key salva: \" + jsonData.key);",
+                                    "}"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "POST",
+                        "header": [],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"key\": \"12345678901\",\n    \"type\": \"CPF\"\n}",
+                            "options": {
+                                "raw": {
+                                    "language": "json"
+                                }
+                            }
+                        },
+                        "url": {
+                            "raw": "{{base_url}}/wallets/{{wallet_id}}/pix-keys",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "wallets",
+                                "{{wallet_id}}",
+                                "pix-keys"
+                            ]
+                        },
+                        "description": "Tipos aceitos: CPF (11 dígitos), EMAIL, PHONE (+55...), EVP (UUID)"
+                    },
+                    "response": []
+                },
+                {
+                    "name": "3. Deposit (Add Money)",
+                    "request": {
+                        "method": "POST",
+                        "header": [],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"amount\": 1000.00\n}",
+                            "options": {
+                                "raw": {
+                                    "language": "json"
+                                }
+                            }
+                        },
+                        "url": {
+                            "raw": "{{base_url}}/wallets/{{wallet_id}}/deposit",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "wallets",
+                                "{{wallet_id}}",
+                                "deposit"
+                            ]
+                        }
+                    },
+                    "response": []
+                },
+                {
+                    "name": "4. Withdraw (Remove Money)",
+                    "request": {
+                        "method": "POST",
+                        "header": [],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"amount\": 50.00\n}",
+                            "options": {
+                                "raw": {
+                                    "language": "json"
+                                }
+                            }
+                        },
+                        "url": {
+                            "raw": "{{base_url}}/wallets/{{wallet_id}}/withdraw",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "wallets",
+                                "{{wallet_id}}",
+                                "withdraw"
+                            ]
+                        }
+                    },
+                    "response": []
+                },
+                {
+                    "name": "5. Get Current Balance",
+                    "request": {
+                        "method": "GET",
+                        "header": [],
+                        "url": {
+                            "raw": "{{base_url}}/wallets/{{wallet_id}}/balance",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "wallets",
+                                "{{wallet_id}}",
+                                "balance"
+                            ]
+                        }
+                    },
+                    "response": []
+                },
+                {
+                    "name": "6. Get Historical Balance",
+                    "request": {
+                        "method": "GET",
+                        "header": [],
+                        "url": {
+                            "raw": "{{base_url}}/wallets/{{wallet_id}}/balance?at=2024-01-01T12:00:00Z",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "wallets",
+                                "{{wallet_id}}",
+                                "balance"
+                            ],
+                            "query": [
+                                {
+                                    "key": "at",
+                                    "value": "2024-01-01T12:00:00Z",
+                                    "description": "Format: ISO-8601"
+                                }
+                            ]
+                        }
+                    },
+                    "response": []
+                }
+            ]
+        },
+        {
+            "name": "Pix Operations",
+            "item": [
+                {
+                    "name": "7. Internal Transfer",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "var jsonData = pm.response.json();",
+                                    "if (jsonData.endToEndId) {",
+                                    "    pm.collectionVariables.set(\"end_to_end_id\", jsonData.endToEndId);",
+                                    "    console.log(\"E2E ID salvo: \" + jsonData.endToEndId);",
+                                    "}",
+                                    "",
+                                    "pm.test(\"Status is Accepted or OK\", function () {",
+                                    "    pm.expect(pm.response.code).to.be.oneOf([200, 201, 202]);",
+                                    "});"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Idempotency-Key",
+                                "value": "{{$guid}}",
+                                "description": "Gera um UUID único para cada requisição"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"fromWalletId\": \"{{wallet_id}}\",\n    \"toPixKey\": \"{{last_pix_key}}\",\n    \"amount\": 10.00\n}",
+                            "options": {
+                                "raw": {
+                                    "language": "json"
+                                }
+                            }
+                        },
+                        "url": {
+                            "raw": "{{base_url}}/pix/transfers",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "pix",
+                                "transfers"
+                            ]
+                        },
+                        "description": "Inicia uma transferência. Use uma chave Pix de OUTRA carteira (crie 2 carteiras para testar corretamente)."
+                    },
+                    "response": []
+                },
+                {
+                    "name": "8. Webhook (CONFIRM)",
+                    "request": {
+                        "method": "POST",
+                        "header": [],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"endToEndId\": \"{{end_to_end_id}}\",\n    \"eventId\": \"{{$guid}}\",\n    \"eventType\": \"CONFIRMED\",\n    \"occurredAt\": \"{{$isoTimestamp}}\"\n}",
+                            "options": {
+                                "raw": {
+                                    "language": "json"
+                                }
+                            }
+                        },
+                        "url": {
+                            "raw": "{{base_url}}/pix/webhook",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "pix",
+                                "webhook"
+                            ]
+                        },
+                        "description": "Simula o Bacen confirmando a transação."
+                    },
+                    "response": []
+                },
+                {
+                    "name": "9. Webhook (REJECT)",
+                    "request": {
+                        "method": "POST",
+                        "header": [],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"endToEndId\": \"{{end_to_end_id}}\",\n    \"eventId\": \"{{$guid}}\",\n    \"eventType\": \"REJECTED\",\n    \"occurredAt\": \"{{$isoTimestamp}}\"\n}",
+                            "options": {
+                                "raw": {
+                                    "language": "json"
+                                }
+                            }
+                        },
+                        "url": {
+                            "raw": "{{base_url}}/pix/webhook",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "pix",
+                                "webhook"
+                            ]
+                        },
+                        "description": "Simula o Bacen rejeitando a transação (deve estornar o valor)."
+                    },
+                    "response": []
+                }
+            ]
+        }
+    ],
+    "variable": [
+        {
+            "key": "base_url",
+            "value": "http://localhost:8080",
+            "type": "string"
+        },
+        {
+            "key": "wallet_id",
+            "value": "",
+            "type": "string"
+        },
+        {
+            "key": "last_pix_key",
+            "value": "",
+            "type": "string"
+        },
+        {
+            "key": "end_to_end_id",
+            "value": "",
+            "type": "string"
+        }
+    ]
+}
