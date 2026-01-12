@@ -21,7 +21,7 @@ public class WalletGatewayImpl implements WalletGateway {
                 wallet.getId(),
                 wallet.getBalance(),
                 wallet.getCreatedAt(),
-                (wallet.getVersion() == null || wallet.getVersion() == 0L) ? null : wallet.getVersion()
+                wallet.getVersion()
         );
 
         WalletEntity savedEntity = repository.save(entity);

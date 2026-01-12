@@ -30,6 +30,6 @@ public class WalletEntity implements Persistable<UUID> {
 
     @Override
     public boolean isNew() {
-        return this.version == null;
+        return version == null;
     }
 }
