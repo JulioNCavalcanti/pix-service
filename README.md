@@ -49,7 +49,7 @@ Os testes foram configurados para rodar com banco em memória (H2), não depende
 
 ## 🧪 Guia de Teste Rápido (Postman)
 
-A Collection inclusa (`pix-service.postman_collection.json`) já contém os payloads prontos. Siga apenas esta ordem de execução:
+A Collection inclusa ([pix-service.postman_collection.json](./pix-service.postman_collection.json)) já contém os payloads prontos. Siga apenas esta ordem de execução:
 
 1.  **Importe a Collection** no Postman.
 2.  **Crie a Carteira A (Origem):**
