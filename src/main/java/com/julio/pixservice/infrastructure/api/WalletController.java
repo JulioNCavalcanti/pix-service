@@ -1,12 +1,8 @@
 package com.julio.pixservice.infrastructure.api;
 
-import com.julio.pixservice.application.dto.BalanceDTO;
-import com.julio.pixservice.application.dto.WalletDTO;
-import com.julio.pixservice.application.dto.WalletTransactionRequest;
-import com.julio.pixservice.application.usecase.CreateWalletUseCase;
-import com.julio.pixservice.application.usecase.DepositUseCase;
-import com.julio.pixservice.application.usecase.GetBalanceUseCase;
-import com.julio.pixservice.application.usecase.WithdrawUseCase;
+import com.julio.pixservice.application.dto.*;
+import com.julio.pixservice.application.usecase.*;
+import com.julio.pixservice.domain.model.PixKey;
 import com.julio.pixservice.domain.model.Wallet;
 import lombok.RequiredArgsConstructor;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -26,6 +22,7 @@ public class WalletController {
     private final DepositUseCase depositUseCase;
     private final WithdrawUseCase withdrawUseCase;
     private final GetBalanceUseCase getBalanceUseCase;
+    private final CreatePixKeyUseCase createPixKeyUseCase;
 
     @PostMapping
     public ResponseEntity<WalletDTO> createWallet() {
@@ -59,5 +56,17 @@ public class WalletController {
                 balance,
                 at != null ? at : LocalDateTime.now()
         ));
+    }
+
+    @PostMapping("/{id}/pix-keys")
+    public ResponseEntity<PixKeyDTO> createPixKey(
+            @PathVariable UUID id,
+            @RequestBody CreatePixKeyRequest request) {
+
+        PixKey createdKey = createPixKeyUseCase.execute(id, request.key(), request.type());
+
+        return ResponseEntity
+                .status(HttpStatus.CREATED)
+                .body(PixKeyDTO.from(createdKey));
     }
 }
